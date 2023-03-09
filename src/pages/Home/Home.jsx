@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom"
+import { Outlet, useLoaderData } from "react-router-dom"
 import { RootList } from "../../components/RootList/RootList"
 import styled from "styled-components"
 import { getContacts } from "../../utils/ContactService";
@@ -15,12 +15,12 @@ export function loader() {
 }
 
 export const Home = ()=>{
-
+    const {contacts} = useLoaderData()
 
     return(
         <>
             <Container>
-                <RootList/>
+                <RootList contacts={contacts}/>
                 <Outlet/>
             </Container>
         </>

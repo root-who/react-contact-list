@@ -1,7 +1,8 @@
 import styled from 'styled-components'
 import React, { useState } from 'react';
 import { AiOutlineStar, AiFillStar, AiOutlineTwitter} from 'react-icons/ai';
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLoaderData } from "react-router-dom";
+import { getContact } from '../../utils/ContactService';
 
 
 const Container = styled.div`
@@ -19,13 +20,13 @@ const ContactContainer = styled.div`
     justify-content: space-around;
 `
 
-const ContactPhotoContainer = styled.div`
+export const ContactPhotoContainer = styled.div`
     display: flex;   
     width : 30%;
     padding: 2% 2%;
 `
 
-const ContactPhoto = styled.img`
+export const ContactPhoto = styled.img`
     display: flex;   
     width: 100%;
     border-radius: 15px;
@@ -104,11 +105,20 @@ const DeleteContact = styled(EditContact)`
     color: #aa5d65;
 `
 
+export  function loader({ params }) {
+  const contact =  getContact(params.contactId);
+  return {contact};
+}
+
 export const Contact = ()=>{
+
+    const navigate = useNavigate();
     // eslint-disable-next-line
-    const [contact, setContact] = useState({
-        first: "João",
-        last: "Paulo",
+    const {contact} = useLoaderData()
+    // eslint-disable-next-line
+    const [contacts, setContact] = useState({
+        first_name: "João",
+        last_name: "Paulo",
         avatar: "https://pbs.twimg.com/profile_images/1554476698200117248/SOTfLA2D_400x400.jpg",
         twitter: "jjpRoot",
         number: "(11) 98909-1160",
@@ -117,31 +127,47 @@ export const Contact = ()=>{
     })
 
     return (
-        <Container >
-            <ContactContainer>
-                <ContactPhotoContainer>
-                    <ContactPhoto src={contact.avatar}/>
-                </ContactPhotoContainer>
-                <ContactInfosContainer>
-                    <ContactInfoContainer>
-                        <ContactName>{contact.first} {contact.last}</ContactName>
-                        {contact.favorite ? <StarFillIcon/> : <StarOutlineIcon/>}
-                    </ContactInfoContainer>
-                    <ContactInfoContainer>
-                        <Link to={`https://twitter.com/${contact.twitter}`}>
-                            <ContactTwitter>{contact.twitter}</ContactTwitter>
-                            <TwitterIcon/>
-                        </Link>
-                    </ContactInfoContainer>
-                    <ContactInfo>{contact.number}</ContactInfo>
-                    <ContactInfo>{contact.notes}</ContactInfo>
-                    <ButtonsActionContainer>
-                        <EditContact type="submit" value="Edit"/>
-                        <DeleteContact  type="submit" value="Delete"/>
-                    </ButtonsActionContainer>
-                </ContactInfosContainer>
-            </ContactContainer>
-        </Container>
+    <>
+        {
+            contact ? 
+            
+            <Container >
+                <ContactContainer>
+                    <ContactPhotoContainer>
+                        <ContactPhoto src={contact.avatar}/>
+                    </ContactPhotoContainer>
+                    <ContactInfosContainer>
+                        <ContactInfoContainer>
+                            <ContactName>{contact.first_name} {contact.last_name}</ContactName>
+                            {contact.favorite ? <StarFillIcon/> : <StarOutlineIcon/>}
+                        </ContactInfoContainer>
+                        <ContactInfoContainer>
+                            <Link to={`https://twitter.com/${contact.twitter}`}>
+                                <ContactTwitter>{contact.twitter}</ContactTwitter>
+                                <TwitterIcon/>
+                            </Link>
+                        </ContactInfoContainer>
+                        <ContactInfo>{contact.number}</ContactInfo>
+                        <ContactInfo>{contact.notes}</ContactInfo>
+                        <ButtonsActionContainer>
+                            <EditContact type="submit" value="Edit" onClick={(event)=>{
+                                event.preventDefault()
+                                navigate(`/editContact/${contact.twitter}`)
+                            }}/>
+                            <DeleteContact  type="submit" value="Delete"onClick={(event)=>{
+                                event.preventDefault()
+                                navigate("/")
+                            }}/>
+                        </ButtonsActionContainer>
+                    </ContactInfosContainer>
+                </ContactContainer>
+            </Container>
+            :
+            <p>
+                Não existe
+            </p>
+        }
+    </>
     );
 
 }

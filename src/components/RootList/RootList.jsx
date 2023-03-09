@@ -1,6 +1,6 @@
-import { useLoaderData } from 'react-router-dom'
 import styled from 'styled-components'
-
+// import { addContact, getContacts } from '../../utils/ContactService'
+import { Link } from "react-router-dom";
 
 const Container = styled.div`
     width: 25%;
@@ -9,12 +9,8 @@ const Container = styled.div`
     align-items: center;
     justify-content: flex-start;
     flex-direction: column;
-    padding: 2% 1%;
-    border-right: 1px solid #a0a0a0;
-`
-
-const ContactListContainer = styled.div`
-
+    padding: 2% 0;
+    border-right: 1px solid #c7c7c7;
 `
 
 const ContactAction = styled.div`
@@ -26,14 +22,14 @@ const ContactAction = styled.div`
 
 `
 
-const ContactSearchInput = styled.input`
+export const ContactSearchInput = styled.input`
     width: 68%;
     background-color: #FFFFFF;
     color: #1b1b1b;
     border: none;
     height: 100%;
     border-radius: 5px;
-    padding-left: 15px ;
+    padding-left: 15px;
     box-shadow: rgb(0 0 0 / 20%) 0px 3px 3px -2px, rgb(0 0 0 / 14%) 0px 3px 4px 0px, rgb(0 0 0 / 12%) 0px 1px 8px 0px;
     :focus {
         outline: none;
@@ -57,8 +53,18 @@ const ContactSearchInput = styled.input`
     :focus:-ms-input-placeholder { color:transparent; } /* Internet Explorer 10-11 */
 `
 
+const LinkTo = styled(Link)`
+    width: ${props=>props.button ? "18%" : "100%"};
+    height: 100%;
+    display: flex;
+    &:hover, :visited, :link, :active{
+        text-decoration: none;
+    }
+    text-decoration: none;
+`
+
 const NewContact = styled.input`
-    width: 18%;
+    width: 100%;
     background-color: #FFFFFF;
     color: #3a62f5;
     border: none;
@@ -70,30 +76,62 @@ const NewContact = styled.input`
     font-weight: 500;
 `
 
+const ContactListContainer = styled.div`
+    margin-top: 2rem;
+    width:100%;
+    display: flex;
+`
 
 const ContactList = styled.ol`
-    
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 `
 const ContactItem = styled.li`
-    
+    cursor: pointer;
+    width: calc(100%);
+    height: 30px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding-top: 15px;
+    border-bottom: 1px solid #3a62f5;
+    &:hover{
+        p, a{
+            background-color: #3a62f5;
+            color: white;
+        }
+        background-color: #3a62f5;
+    }
+`
+const ContactName = styled.p`
+    color: #000000;
+    font-size: 16px;
+    font-weight: bold;
+    padding-left: 20px;
+    margin-bottom: 5px;
 `
 
 
-export const RootList = ()=>{
-    const {contacts} = useLoaderData()    
+export const RootList = ({contacts})=>{
     return(
         <>
             <Container>
                 <ContactAction>
                     <ContactSearchInput placeholder='🔍 Search'/>
-                    <NewContact type="submit" value="New"/>
+                    <LinkTo button to={"/newContact"}>
+                        <NewContact type="submit" value="New" />
+                    </LinkTo>
                 </ContactAction>
                 <ContactListContainer>
                     <ContactList>
                         {
                             contacts ? contacts.map((contact, key)=>(
                                 <ContactItem key={key}>
-                                    {contact.name}
+                                    <LinkTo to={`/contacts/${contact.twitter}`}>
+                                        <ContactName>{contact.first_name} {contact.last_name}</ContactName>
+                                    </LinkTo>
                                 </ContactItem>
                             ))
                             :
