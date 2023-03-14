@@ -1,6 +1,6 @@
 import styled from 'styled-components'
-// import { addContact, getContacts } from '../../utils/ContactService'
 import { Link } from "react-router-dom";
+import React, { useEffect } from 'react'
 
 const Container = styled.div`
     width: 25%;
@@ -53,7 +53,7 @@ export const ContactSearchInput = styled.input`
     :focus:-ms-input-placeholder { color:transparent; } /* Internet Explorer 10-11 */
 `
 
-const LinkTo = styled(Link)`
+export const LinkTo = styled(Link)`
     width: ${props=>props.button ? "18%" : "100%"};
     height: 100%;
     display: flex;
@@ -90,17 +90,19 @@ const ContactList = styled.ol`
 `
 const ContactItem = styled.li`
     cursor: pointer;
-    width: calc(100%);
+    width: calc(95%);
     height: 30px;
     display: flex;
     align-items: flex-end;
     justify-content: flex-start;
     padding-top: 15px;
     border-bottom: 1px solid #3a62f5;
+    border-radius: 5px;
     &:hover{
         p, a{
             background-color: #3a62f5;
             color: white;
+            border-radius: 5px;
         }
         background-color: #3a62f5;
     }
@@ -114,28 +116,36 @@ const ContactName = styled.p`
 `
 
 
-export const RootList = ({contacts})=>{
+export const RootList = ({contacts, searchValue, setSearchValue})=>{
+
+    useEffect(()=>{
+    })
+    
     return(
         <>
             <Container>
                 <ContactAction>
-                    <ContactSearchInput placeholder='🔍 Search'/>
-                    <LinkTo button to={"/newContact"}>
+                    <ContactSearchInput 
+                        placeholder='🔍 Search' 
+                        onChange={(event)=>{
+                            event.preventDefault()
+                            setSearchValue(event.target.value)
+                        }}
+                    />
+                    <LinkTo button="true" to={"/newContact"} state={undefined}>
                         <NewContact type="submit" value="New" />
                     </LinkTo>
                 </ContactAction>
                 <ContactListContainer>
                     <ContactList>
                         {
-                            contacts ? contacts.map((contact, key)=>(
-                                <ContactItem key={key}>
-                                    <LinkTo to={`/contacts/${contact.twitter}`}>
-                                        <ContactName>{contact.first_name} {contact.last_name}</ContactName>
-                                    </LinkTo>
-                                </ContactItem>
+                            contacts.map((contact, key)=>(
+                                    <ContactItem key={key}>
+                                        <LinkTo to={`/contacts/${contact.twitter}`} state={{contact : contact}}>
+                                            <ContactName>{contact.first_name} {contact.last_name}</ContactName>
+                                        </LinkTo>
+                                    </ContactItem>
                             ))
-                            :
-                            <></>
                         }
                     </ContactList>
                 </ContactListContainer>
