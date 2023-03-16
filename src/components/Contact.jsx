@@ -4,7 +4,8 @@ import styled from 'styled-components'
 
 
 const LinkInfo = styled(LinkTo)`
-    /* align-self: center; */
+    width: 50%;
+    align-self: flex-end;
 `
 
 const Contact = ({contact})=>{
@@ -16,7 +17,7 @@ const Contact = ({contact})=>{
             contact && 
             <Container list={true}>
                 <ContactContainer list={true}>
-                    <ContactPhotoContainer>
+                    <ContactPhotoContainer list={true}>
                         <ContactPhoto list={true} src={contact.avatar}/>
                     </ContactPhotoContainer>
                     <ContactInfosContainer>

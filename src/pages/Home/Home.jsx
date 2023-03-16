@@ -27,7 +27,7 @@ export const Home = ()=>{
     },[contacts])
 
     const concatNames = (first_name, last_name) =>{
-        return String(first_name).concat(" ", last_name)
+        return String(first_name).concat(" ", last_name).toLowerCase()
     }
 
     const sortList = (list) =>{
@@ -46,7 +46,7 @@ export const Home = ()=>{
     function searchList (){
         if(searchValue !== "" && contacts){
             return sortList(contacts)
-                    .filter(contact => concatNames(contact.first_name, contact.last_name).toLocaleLowerCase().startsWith(String(deb).toLowerCase()))
+                    .filter(contact => concatNames(contact.first_name, contact.last_name).toLocaleLowerCase().includes(String(deb).toLowerCase()))
         }else if(contacts){
             return sortList(contacts)
         }

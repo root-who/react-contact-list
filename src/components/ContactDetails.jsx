@@ -40,13 +40,13 @@ const ContactDatails = ({contact_size, contact_from_list})=>{
     <>
         {
             contact && 
-            <Container list={false}>
+            <Container >
                 <Link to={`/`}>
                     <ArrowBack/>
                 </Link>
-                <ContactContainer list={false}>
-                    <ContactPhotoContainer>
-                        <ContactPhoto list={false} src={contact.avatar}/>
+                <ContactContainer >
+                    <ContactPhotoContainer >
+                        <ContactPhoto  src={contact.avatar}/>
                     </ContactPhotoContainer>
                     <ContactInfosContainer>
                         <ContactInfoContainer>

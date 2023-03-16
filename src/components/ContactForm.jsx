@@ -2,6 +2,7 @@ import React, { useEffect, useState,} from "react"
 import { Link, useLocation, useNavigate, useOutletContext} from "react-router-dom"
 import styled from "styled-components"
 import { addContact, editContact } from "../utils/ContactService"
+import { validateName, validatePhoneNumber, validateTwitter, validateTwitterByEdit } from "../utils/ValidationForm"
 import { ContactPhoto, EditContact, DeleteContact, StarFillIcon, StarOutlineIcon} from './ContactStyled'
 import {ContactSearchInput} from './RootList'
 
@@ -26,6 +27,7 @@ const ContactContainer = styled.form`
 const ContactInfoInputContainer = styled.div`
     width: 100%;
     display: flex;
+    flex-wrap: wrap;
     justify-content: ${props=> props.favorite ? "flex-start": "space-between"};
     align-items: center;
 `
@@ -39,7 +41,15 @@ const ContactLabel = styled.label`
 const ContactInput = styled(ContactSearchInput)`
     padding-left: 5px;
     width: ${props=> props.full ? "70%": "30%"};
+    border: ${props=>props.isValid == "valid" ? "none" :  "1px red solid"};
     height: 35px;
+`
+
+const ContactInputSpan = styled.span`
+    color:red;
+    width:100%;
+    text-align: end;
+    margin-top:5px;
 `
 
 const ContactViewAndActionContainer = styled.div`
@@ -57,8 +67,9 @@ const ContactActionsContainer = styled.div`
     align-items: flex-end;
 `
 const ContactPreviewPhoto = styled(ContactPhoto)`
-    max-width: 280px;
-    max-height: 280px;
+    width: 250px;
+    height: 250px;
+    margin: auto auto;
 `
 
 export const LinkTo = styled(Link)`
@@ -85,38 +96,34 @@ const ContactForm = ()=>{
     let { state } = useLocation();
     const [urlImageError, setUrlImageError] = useState(undefined)
     const [contactEdit, setContactEdit] = useState()
-
-    
     const [contact, setContact] = useState({
         first_name:{
             label: "First name",
             value:"",
-            isValid: true
+            isValid: "valid"
         },
         last_name:{
             label: "Last name",
             value:"",
-            isValid: true
+            isValid: "valid"
         },
         twitter:{
             label: "Twitter",
             value:"",
-            isValid: true
+            isValid: "valid"
         },
         avatar:{
             label: "Url Avatar",
             value:"",
-            isValid: true
         },
         number:{
             label: "Phone number",
             value:"",
-            isValid: true
+            isValid: "valid"
         },
         notes:{
             label: "Notes",
             value:"",
-            isValid: true
         },
         favorite: {
             label: "Favorite",
@@ -132,17 +139,17 @@ const ContactForm = ()=>{
         const initContact = (obj) =>{
             setContactEdit(obj)
             setUrlImageError(undefined)
-            for (const key in obj) {
-                console.log(obj[key])
+            console.log(state.contactEdit)
+            for (const key in contact) {
                 setContact(prevState => ({
                         ...prevState,
                         [key]: {
                             label: prevState[key].label,
-                            value: obj[key]
+                            value: obj[key],
+                            isValid:"valid"
                         }
                     }));
             }
-            
         }
         
         const cleanForm = () =>{
@@ -151,16 +158,16 @@ const ContactForm = ()=>{
                         ...prevState,
                         [key]: {
                             label: prevState[key].label,
-                            value: ""
+                            value: "",
+                            isValid:"valid"
                         }
                     }));
             }
             setContactEdit(undefined)
             imageError()
         }
-        
-
         init()
+
     },[contact, state, contactEdit, urlImageError])
 
     const setFavorite = () =>{
@@ -172,43 +179,85 @@ const ContactForm = ()=>{
                         ...prevState,
                         "favorite": {
                             label: prevState["favorite"].label,
-                            value: favorite
+                            value: favorite,
+                            isValid:"valid"
                         }
                     })); 
     }
-    
+    const validate = (form) =>{
+        let validFirstName = "valid"
+        let validLastName = "valid"
+        let validTwitter = "valid"
+        let validPhoneNumber = "valid"
+        if(form === "edit"){
+            validFirstName = validateName(contact.first_name.value)
+            validLastName = validateName(contact.last_name.value)
+            validTwitter = validateTwitterByEdit(contact.twitter.value)
+            validPhoneNumber = validatePhoneNumber(contact.number.value)
+        }else{
+            validFirstName = validateName(contact.first_name.value)
+            validLastName = validateName(contact.last_name.value)
+            validTwitter = validateTwitter(contact.twitter.value)
+            validPhoneNumber = validatePhoneNumber(contact.number.value)
+        }
+        const formValid = {
+            first_name:validFirstName,
+            last_name:validLastName,
+            twitter:validTwitter,
+            number:validPhoneNumber,
+        }
+        for (const key in formValid) {
+            setContact(prevState => ({
+                            ...prevState,
+                            [key]: {
+                                label: prevState[key].label,
+                                value: prevState[key].value,
+                                isValid: formValid[key]
+                            }
+                        }));
+        }
+        return (validPhoneNumber && validLastName && validTwitter && validPhoneNumber)
+    }
 
     const saveContact = (e) =>{
-        e.preventDefault()
+        let valid = false
         const saveContact = {
             first_name: contact.first_name.value,
             last_name: contact.last_name.value,
             twitter: contact.twitter.value,
-            avatar: contact.avatar.value,
+            avatar: urlImageError ? urlImageError : contact.avatar.value,
             number: contact.number.value,
             notes: contact.notes.value,
             favorite: contact.favorite.value
-        }
+        }        
         if(contactEdit){
-            editContact(saveContact)
-            
+            valid = validate("edit") 
+            saveContact.id = contactEdit.id
+            valid && editContact(saveContact)
         }
         else {
-            addContact(saveContact)
+            valid = validate() 
+            valid && addContact(saveContact)
         }
-    updateContacts()
-    navigate(`/`)
+        console.log(saveContact)
+        console.log(valid)
+
+        if(valid){
+            updateContacts()
+            navigate(`/`)
+        }
+
     }
 
     const handleChange = (e) => {
             const { name, value } = e.target;
             if(name === "avatar") setUrlImageError(undefined)
-            console.log(value)
             setContact(prevState => ({
                 ...prevState,
                 [name]: {
                     label: prevState[name].label,
-                    value: value
+                    value: value,
+                    isValid: "valid"
                 }
             }));
     };
@@ -220,69 +269,79 @@ const ContactForm = ()=>{
     return(
         <>
         <Container>
-            <ContactContainer>
+            <ContactContainer >
                 <ContactInfoInputContainer>
                     <ContactLabel>{"Name"}</ContactLabel>
                     <ContactInput 
+                    required
                     type="text" 
                     onChange={handleChange} 
                     name={"first_name"} 
                     placeholder={contact.first_name.label} 
                     defaultValue={contact.first_name.value}
-                    validation={contact.first_name.isValid}
+                    isValid={contact.first_name.isValid}
                     />
                     <ContactInput 
+                    required
                     type="text" 
                     onChange={handleChange} 
                     name={"last_name"} 
                     placeholder={contact.last_name.label} 
                     defaultValue={contact.last_name.value}
-                    validation={contact.last_name.isValid}
+                    isValid={contact.last_name.isValid}
                     />
+                    {(!contact.last_name.isValid || !contact.first_name.isValid) && <ContactInputSpan>Name can't be empty</ContactInputSpan>}
                 </ContactInfoInputContainer>
                 <ContactInfoInputContainer>
                     <ContactLabel>{contact.twitter.label}</ContactLabel>
                     <ContactInput full 
+                    required
                     type="text" 
                     onChange={handleChange} 
                     name={"twitter"} 
                     placeholder={"@"} 
                     defaultValue={contact.twitter.value}
-                    validation={contact.twitter.isValid}
+                    isValid={contact.twitter.isValid}
                     />
+                    {!contact.twitter.isValid && <ContactInputSpan>Twitter can't be empty</ContactInputSpan>}
                 </ContactInfoInputContainer>
                 <ContactInfoInputContainer>
                     <ContactLabel>{contact.number.label}</ContactLabel>
                     <ContactInput full 
+                    required
                     type="text"
                     onChange={handleChange}  
                     name={"number"} 
-                    placeholder={"+55 (11) 999999999"} 
+                    placeholder={"(11)99999-9999"} 
                     defaultValue={contact.number.value}
-                    validation={contact.number.isValid}
+                    isValid={contact.number.isValid}
                     />
+                    {!contact.number.isValid && <ContactInputSpan>Number can't be empty and need follow the pattern (xx)xxxxx-xxxx</ContactInputSpan>}
                 </ContactInfoInputContainer>
                 <ContactInfoInputContainer>
                     <ContactLabel>{contact.notes.label}</ContactLabel>
                     <ContactInput full 
+                    required
                     type="text" 
                     onChange={handleChange} 
                     name={"notes"} 
                     placeholder={"Some note"} 
                     defaultValue={contact.notes.value}
-                    validation={contact.notes.isValid}
+                    isValid="valid"
                     />
+                    
                     
                 </ContactInfoInputContainer>
                 <ContactInfoInputContainer>
                     <ContactLabel>{contact.avatar.label}</ContactLabel>
                     <ContactInput full 
+                    required
                     type="text" 
                     onChange={handleChange} 
                     name={"avatar"} 
                     placeholder={"http://url-to-avatar-photo.jpg"} 
                     defaultValue={contact.avatar.value}
-                    validation={contact.avatar.isValid}
+                    isValid="valid"
                     />
                     
                 </ContactInfoInputContainer>

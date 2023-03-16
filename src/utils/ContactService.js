@@ -16,16 +16,21 @@ export const setContacts = (contacts)=>{
 
 export const addContact = (contact)=>{
     let contacts = getContacts()
-    if(contacts){
+    let contactsQnt = contacts.length
+    if(contactsQnt > 0){
+        contact.id = contactsQnt + 1
         contacts.push(contact)
         setContacts(contacts)
-    }else setContacts([contact])  
+    }else {
+        contact.id = 1
+        setContacts([contact])  
+    }
 }
 
 export const editContact = (contact)=>{
     let contacts = getContacts()
     contacts.forEach((value, key, arr)=>{
-        if(value.twitter === contact.twitter){
+        if(contact.id === value.id){
             arr[key] = contact
         }
     })  

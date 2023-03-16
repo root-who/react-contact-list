@@ -21,19 +21,20 @@ export const ArrowBack = styled(BsFillArrowLeftSquareFill)`
 `
 
 export const ContactContainer = styled.div`
-    flex-grow: ${props=>props.list ? "0": "1"};
+    /* flex-grow: ${props=>props.list ? "0": "1"}; */
     display: flex;  
-    width:60%; 
+    width: ${props=>props.list ? "45%": "60%"};
     flex-wrap: wrap;
     align-items: stretch;
-    justify-content: space-around;
-    border: 1px solid #c7c7c7;
+    justify-content: space-between;
     border-radius: 5px;
+    box-shadow: rgb(0 0 0 / 20%) 0px 3px 3px -2px, rgb(0 0 0 / 14%) 0px 3px 4px 0px, rgb(0 0 0 / 12%) 0px 1px 8px 0px;
+
 `
 
 export const ContactPhotoContainer = styled.div`
     display: flex;   
-    width : 30%;
+    width : ${props=>props.list ? "45%": "51%"};
     padding: 2% 2%;
 `
 
@@ -41,14 +42,14 @@ export const ContactPhoto = styled.img`
     display: flex;   
     width: 100%;
     border-radius: 15px;
-    max-height: ${props=>props.list ? "174px": "247px"}
+    height: ${props=>props.list ? "174px": "247px"}
 `
 
 export const ContactInfosContainer = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width : 46%;
+    width : 41%;
     padding: 2% 2%;
     gap: 14px;
 `
@@ -56,6 +57,9 @@ export const ContactInfoContainer = styled.div`
     width: 100%;
     display: flex;
     align-items: flex-start;
+    a{
+        width:100%;
+    }
 `
 
 export const ContactInfo= styled.p`
@@ -68,6 +72,7 @@ export const ContactInfo= styled.p`
 
 export const ContactName= styled(ContactInfo)`
     font-size: 22px;
+    /* width: 50%; */
     font-weight: bold;
 `
 export const ContactTwitter = styled(ContactInfo)`
@@ -94,7 +99,7 @@ export const StarOutlineIcon = styled(AiOutlineStar)`
 
 export const ButtonsActionContainer = styled.div`
     display: flex;
-    width: 80%;
+    width: 100%;
     a{
         margin-right: 1rem;
     }
